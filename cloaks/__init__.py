@@ -20,10 +20,7 @@ RPL_RSACHALLENGE2      = "740"
 RPL_ENDOFRSACHALLENGE2 = "741"
 RPL_YOUREOPER          = "381"
 
-RE_UNAFF   = re_compile("[^a-z0-9-_]")
-RE_INVALID = re_compile("[^a-zA-Z0-9-/.]")
-
-RE_CLOAKED = re_compile(r"^Assigned vhost \S+ to (\S+)$")
+RE_INVALID = re_compile("[^a-zA-Z0-9-_]")
 
 def _hash(s: str, digits: int) -> str:
     hash  = int(sha1(s.encode("utf8")).hexdigest(), 16)
@@ -31,7 +28,7 @@ def _hash(s: str, digits: int) -> str:
     return str(hash).zfill(digits) # zero-pad for short hashes
 
 def _sanitise(s: str) -> str:
-    valid = RE_UNAFF.sub("", s)     # no invalid chars
+    valid = RE_INVALID.sub("", s)   # no invalid chars
     valid = valid.strip("_")        # no leading/trailing _
     valid = valid.replace("_", "-") # '_' -> '-'
     return valid
@@ -115,7 +112,7 @@ class Server(BaseServer):
                     await self._cloak(self.users[nickl])
 
     async def _cloak(self, user: User):
-        account = self.casefold(user.account)
+        account = user.account
         clean   = _sanitise(account)
         if not clean == "":
             cloak = f"user/{clean}"

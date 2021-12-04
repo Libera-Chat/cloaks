@@ -111,6 +111,15 @@ class Server(BaseServer):
                         self.users[nickl].account is not None):
                     await self._cloak(self.users[nickl])
 
+        elif (line.command == "CHGHOST" and
+                line.params[1].startswith("user/")):
+
+            await self.send(build("KICK", [
+                self._config.channel,
+                line.hostmask.nickname,
+                "You've been cloaked"]
+            ))
+
     async def _cloak(self, user: User):
         account = user.account
         clean   = _sanitise(account)

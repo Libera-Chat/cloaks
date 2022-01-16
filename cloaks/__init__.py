@@ -129,7 +129,7 @@ class Server(BaseServer):
                 hash   = _hash(account, 7)
                 cloak += f"/x-{hash}"
 
-            await self.send(build("PRIVMSG", ["NickServ", f"VHOST {account} ON {cloak}"]))
+            await self.send(build("PRIVMSG", ["NickServ", f"VHOST {account} ON {cloak} FORCE"]))
             return True
         else:
             return False

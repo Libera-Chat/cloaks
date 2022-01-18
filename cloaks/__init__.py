@@ -82,34 +82,20 @@ class Server(BaseServer):
         elif line.command == RPL_YOUREOPER:
             await self.send(build("MODE", [self.nickname, "-s"]))
 
-        elif (line.command == "PRIVMSG" and
-                line.params[0] == self._config.channel and
-                self.casefold(line.hostmask.nickname) in self.users):
+        elif (line.command == "JOIN"
+                and line.source is not None
+                and not self.is_me(line.hostmask.nickname)
+                and not (account := line.params[1]) == "*"
+                and (
+                    not "/" in line.hostmask.hostname
+                    or line.hostmask.hostname.startswith("gateway/")
+                )):
 
-            channel    = self.channels[self._config.channel]
-            nick       = line.hostmask.nickname
-            nickl      = self.casefold(nick)
-            user       = self.users[nickl]
-            message    = line.params[1]
-            cmd, *args = message.split()
-            cmd = cmd.lower()
-
-            if (cmd == "!cloakme" and
-                    user.account is not None):
-
-                if not await self._cloak(user):
-                    await self.send(build("PRIVMSG", [
-                        self._config.channel,
-                        f"{nick}: your account name cannot be cloaked"
-                    ]))
-
-            elif (cmd == "!cloak" and
-                    args and
-                    "o" in channel.users[nickl].modes):
-                nick = self.casefold(args[0])
-                if (nick in self.users and
-                        self.users[nickl].account is not None):
-                    await self._cloak(self.users[nickl])
+            if not await self._cloak(account):
+                await self.send(build("PRIVMSG", [
+                    self._config.channel,
+                    f"{nick}: your account name cannot be cloaked"
+                ]))
 
         elif (line.command == "CHGHOST" and
                 line.params[1].startswith("user/")):
@@ -120,9 +106,8 @@ class Server(BaseServer):
                 "You've been cloaked"]
             ))
 
-    async def _cloak(self, user: User):
-        account = user.account
-        clean   = _sanitise(account)
+    async def _cloak(self, account):
+        clean = _sanitise(account)
         if not clean == "":
             cloak = f"user/{clean}"
             if not account == clean:

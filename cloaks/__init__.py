@@ -114,10 +114,15 @@ class Server(BaseServer):
         elif (line.command == "CHGHOST" and
                 line.params[1].startswith("user/")):
 
+            newcloak = line.params[1]
             await self.send(build("KICK", [
                 self._config.channel,
                 line.hostmask.nickname,
                 "You've been cloaked"]
+            ))
+            await self.send(build("NOTICE", [
+                line.hostmask.nickname,
+                f"Your new cloak is `{newcloak}`. Remember to use SASL to ensure you're always cloaked."]
             ))
 
     async def _cloak(self, user: User):

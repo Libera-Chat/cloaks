@@ -24,7 +24,7 @@ def load(filepath: str):
         config_yaml = yaml.safe_load(file.read())
 
     nickname = config_yaml["nickname"]
-    message  = Template(config_yaml["message"] or "")
+    message  = Template(config_yaml.get("message", ""))
 
     server   = config_yaml["server"]
     hostname, port_s = server.split(":", 1)

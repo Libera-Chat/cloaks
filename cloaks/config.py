@@ -46,6 +46,7 @@ def load(filepath: str):
         config_yaml.get("realname", nickname),
         config_yaml["password"],
         config_yaml["channel"],
+        message,
         (config_yaml["sasl"]["username"], config_yaml["sasl"]["password"]),
         (oper_name, oper_file, oper_pass),
     )

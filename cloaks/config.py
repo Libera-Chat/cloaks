@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from os.path     import expanduser
 from re          import compile as re_compile
+from string      import Template
 from typing      import List, Pattern, Tuple
 
 import yaml
@@ -13,6 +14,7 @@ class Config(object):
     realname: str
     password: str
     channel:  str
+    message:  Template
 
     sasl: Tuple[str, str]
     oper: Tuple[str, str]
@@ -22,6 +24,7 @@ def load(filepath: str):
         config_yaml = yaml.safe_load(file.read())
 
     nickname = config_yaml["nickname"]
+    message  = Template(config_yaml.get("message", ""))
 
     server   = config_yaml["server"]
     hostname, port_s = server.split(":", 1)

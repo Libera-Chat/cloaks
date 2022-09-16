@@ -2,6 +2,7 @@ server: irc.libera.chat:+6697
 nickname: cloaks
 password: cloaks:hunter2
 channel: "#libera-cloak"
+message: "Your new cloak is $cloak"
 
 sasl:
   username: cloaks

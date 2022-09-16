@@ -117,8 +117,19 @@ class Server(BaseServer):
             await self.send(build("KICK", [
                 self._config.channel,
                 line.hostmask.nickname,
-                "You've been cloaked"]
-            ))
+                "You've been cloaked"
+            ]))
+
+            cloak = line.params[1]
+            channel = self._config.channel
+            nick = line.hostmask.nickname
+            message = self._config.message.substitute_safe(cloak=cloak, channel=channel, nick=nick)
+
+            if message:
+                await self.send(build("NOTICE", [
+                    nick,
+                    message
+                ]))
 
     async def _cloak(self, user: User):
         account = user.account

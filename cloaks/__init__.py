@@ -123,7 +123,7 @@ class Server(BaseServer):
             cloak = line.params[1]
             channel = self._config.channel
             nick = line.hostmask.nickname
-            message = self._config.message.substitute_safe(cloak=cloak, channel=channel, nick=nick)
+            message = self._config.message.safe_substitute(cloak=cloak, channel=channel, nick=nick)
 
             if message:
                 await self.send(build("NOTICE", [

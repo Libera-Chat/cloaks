@@ -9,21 +9,16 @@ from .config import Config, load as config_load
 async def main(config: Config):
     bot = Bot(config)
 
-    host, port, tls      = config.server
     sasl_user, sasl_pass = config.sasl
 
-    params = ConnectionParams(
-        config.nickname,
-        host,
-        port,
-        tls,
-        username=config.username,
-        realname=config.realname,
-        password=config.password,
-        sasl=SASLUserPass(sasl_user, sasl_pass),
-        autojoin=[config.channel]
-    )
-    await bot.add_server(host, params)
+    params = ConnectionParams.from_hoststring(config.nickname, config.server)
+    params.username=config.username
+    params.realname=config.realname
+    params.password=config.password
+    params.sasl=SASLUserPass(sasl_user, sasl_pass)
+    params.autojoin=[config.channel]
+
+    await bot.add_server("irc", params)
     await bot.run()
 
 if __name__ == "__main__":

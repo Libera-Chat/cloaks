@@ -8,7 +8,7 @@ import yaml
 
 @dataclass
 class Config(object):
-    server:   Tuple[str, int, bool]
+    server:   str
     nickname: str
     username: str
     realname: str
@@ -26,21 +26,12 @@ def load(filepath: str):
     nickname = config_yaml["nickname"]
     message  = Template(config_yaml.get("message", ""))
 
-    server   = config_yaml["server"]
-    hostname, port_s = server.split(":", 1)
-    tls      = False
-
-    if port_s.startswith("+"):
-        tls    = True
-        port_s = port_s.lstrip("+")
-    port = int(port_s)
-
     oper_name = config_yaml["oper"]["name"]
     oper_file = expanduser(config_yaml["oper"]["file"])
     oper_pass = config_yaml["oper"]["pass"]
 
     return Config(
-        (hostname, port, tls),
+        config_yaml["server"],
         nickname,
         config_yaml.get("username", nickname),
         config_yaml.get("realname", nickname),

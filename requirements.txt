@@ -1,3 +1,3 @@
 ircchallenge ~=0.1.2
-ircrobots    ~=0.5.0
-pyyaml       ~=5.4.1
+ircrobots    ~=0.6.6
+pyyaml       ~=6.0.1

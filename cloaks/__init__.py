@@ -1,6 +1,5 @@
 import asyncio, re
-from hashlib import sha1
-from re      import compile as re_compile
+from re import compile as re_compile
 
 from irctokens import build, Line
 from ircstates import User
@@ -21,17 +20,6 @@ RPL_ENDOFRSACHALLENGE2 = "741"
 RPL_YOUREOPER          = "381"
 
 RE_INVALID = re_compile("[^a-zA-Z0-9-_]")
-
-def _hash(s: str, digits: int) -> str:
-    hash  = int(sha1(s.encode("utf8")).hexdigest(), 16)
-    hash %= (10**digits)           # n decimal digits
-    return str(hash).zfill(digits) # zero-pad for short hashes
-
-def _sanitise(s: str) -> str:
-    valid = RE_INVALID.sub("", s)   # no invalid chars
-    valid = valid.strip("_")        # no leading/trailing _
-    valid = valid.replace("_", "-") # '_' -> '-'
-    return valid
 
 class Server(BaseServer):
     def __init__(self,
@@ -97,11 +85,7 @@ class Server(BaseServer):
             if (cmd == "!cloakme" and
                     user.account is not None):
 
-                if not await self._cloak(user):
-                    await self.send(build("PRIVMSG", [
-                        self._config.channel,
-                        f"{nick}: your account name cannot be cloaked"
-                    ]))
+                await self._cloak(user)
 
             elif (cmd == "!cloak" and
                     args and
@@ -132,18 +116,7 @@ class Server(BaseServer):
                 ]))
 
     async def _cloak(self, user: User):
-        account = user.account
-        clean   = _sanitise(account)
-        if not clean == "":
-            cloak = f"user/{clean}"
-            if not account == clean:
-                hash   = _hash(account, 7)
-                cloak += f"/x-{hash}"
-
-            await self.send(build("PRIVMSG", ["NickServ", f"VHOST {account} ON {cloak} FORCE"]))
-            return True
-        else:
-            return False
+        await self.send(build("PRIVMSG", ["NickServ", f"DEFAULTCLOAK {user.account} FORCE"]))
 
     def line_preread(self, line: Line):
         print(f"< {line.format()}")
